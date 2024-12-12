@@ -39,12 +39,13 @@ def allow_replit_domains(origin):
     allowed_patterns = [
         r"https://.*\.replit\.(dev|app|co)$",
         r"http://localhost:3000",
+        r"https://lifebeyondthe9to5\.com$"
     ]
     return any(re.match(pattern, origin) for pattern in allowed_patterns)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[],  
-    allow_origin_regex=r"https://.*\.replit\.(dev|app|co)$|http://localhost:3000",
+    allow_origin_regex=r"https://.*\.replit\.(dev|app|co)$|http://localhost:3000|https://lifebeyondthe9to5\.com$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
