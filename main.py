@@ -25,7 +25,7 @@ import traceback
 app = FastAPI(
     title="Financial Planning Simulator API",
     description="A financial planning calculator API for testing purposes only. Not financial advice.",
-    version="0.2.0",
+    version="0.5.0",
 )
 # Create limiter
 limiter = Limiter(key_func=get_remote_address)

@@ -45,24 +45,24 @@ DEFAULT_CORRELATION = np.array([
 
 # Other default values
 DEFAULT_VALUES = {
-    "starting_portfolio": 1700000,
+    "starting_portfolio": 1200000,
     "planning_horizon": 40,
-    "age": 45,
-    "default_expenses": 50000,
+    "age": 50,
+    "default_expenses": 60000,
     "default_income": 0,
     "social_security_age": 67,
-    "social_security_amount": 10000,
-    "inflation_rate": 0.02,
+    "social_security_amount": 24000,
+    "inflation_rate": 0.03,
     "num_simulations": DEFAULT_NUM_SIMULATIONS,
-    "expense_growth_rate": 0.02,  # 2% annual growth by default
+    "expense_growth_rate": 0.03,  # 3% annual growth by default
     "income_growth_rate": 0.03,   # 3% annual growth by default
 }
 
 
 VALIDATION_LIMITS = {
     "portfolio": {"min": 0, "max": 100_000_000},  # $100M max
-    "horizon": {"min": 1, "max": 100},            # 100 years max
-    "age": {"min": 10, "max": 100},              # Age limits
+    "horizon": {"min": 1, "max": 200},            # 200 years max
+    "age": {"min": 10, "max": 200},              # Age limits
     "expenses": {"min": 0, "max": 10_000_000},   # $10M annual max
     "income": {"min": 0, "max": 10_000_000},     # $10M annual max
     "simulations": {"min": 100, "max": 10000},   # Simulation count limits
