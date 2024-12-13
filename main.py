@@ -35,17 +35,16 @@ RATE_LIMIT = "15/minute"
 BURST_LIMIT = "3/second"
 
 # CORS configuration
-def allow_replit_domains(origin):
-    allowed_patterns = [
-        r"https://.*\.replit\.(dev|app|co)$",
-        r"http://localhost:3000",
-        r"https://lifebeyondthe9to5\.com"
-    ]
-    return any(re.match(pattern, origin) for pattern in allowed_patterns)
+ALLOWED_ORIGINS = [
+    "https://lifebeyondthe9to5.com",
+    "http://localhost:3000"
+]
+ALLOWED_REGEX = r"https://.*\.replit\.(dev|app|co)$"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[],  
-    allow_origin_regex=r"https://.*\.replit\.(dev|app|co)$|http://localhost:3000|https://lifebeyondthe9to5\.com",
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=ALLOWED_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -83,12 +82,8 @@ async def cors_error_handler(request: Request, exc: HTTPException):
             error_code="CORS_ERROR",
             message="Origin not allowed",
             details={
-                "allowed_patterns": [
-                    "https://*.replit.dev",
-                    "https://*.replit.app",
-                    "https://*.replit.co",
-                    "http://localhost:3000"
-                ]
+                "allowed_origins": ALLOWED_ORIGINS,
+                "allowed_pattern": ALLOWED_REGEX
             }
         )
         return JSONResponse(
