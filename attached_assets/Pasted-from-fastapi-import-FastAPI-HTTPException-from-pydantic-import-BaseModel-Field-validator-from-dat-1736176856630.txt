@@ -1,0 +1,280 @@
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field, validator
+from datetime import date, timedelta
+from typing import List, Optional, Dict
+from enum import Enum
+from dateutil.relativedelta import relativedelta
+from collections import defaultdict
+import math
+
+app = FastAPI(title="Enhanced Cash Flow Projection API", version="2.0")
+
+# Enums for validation
+class TransactionType(str, Enum):
+    one_time = "one-time"
+    repeating = "repeating"
+
+class Frequency(str, Enum):
+    daily = "daily"
+    weekly = "weekly"
+    monthly = "monthly"
+    quarterly = "quarterly"
+    annual = "annual"
+
+# Models
+class Transaction(BaseModel):
+    name: str = Field(..., example="Subscription Fee")
+    amount: float = Field(..., example=1000.0, gt=0)
+    type: TransactionType = Field(..., example="repeating")
+    frequency: Optional[Frequency] = Field(None, example="monthly")
+    start_date: date = Field(..., example="2025-01-01")
+    end_date: Optional[date] = Field(None, example="2025-12-31")
+
+    @validator("frequency", always=True)
+    def validate_frequency(cls, v, values):
+        if values.get("type") == TransactionType.repeating:
+            if not v:
+                raise ValueError("Frequency is required for repeating transactions.")
+        else:
+            if v is not None:
+                raise ValueError("Frequency should not be set for one-time transactions.")
+        return v
+
+    @validator("end_date")
+    def validate_dates(cls, v, values):
+        start = values.get("start_date")
+        if v and v < start:
+            raise ValueError("end_date cannot be before start_date.")
+        return v
+
+class ProjectionRequest(BaseModel):
+    expenses: List[Transaction] = Field(default_factory=list)
+    revenues: List[Transaction] = Field(default_factory=list)
+    start_date: date = Field(..., example="2025-01-01")
+    end_date: date = Field(..., example="2025-12-31")
+
+    @validator("end_date")
+    def validate_horizon(cls, v, values):
+        start = values.get("start_date")
+        if start and v < start:
+            raise ValueError("end_date cannot be before start_date.")
+        return v
+
+class CashFlowEntry(BaseModel):
+    date: date
+    total_revenues: float
+    total_expenses: float
+    net_cash_flow: float
+
+class AggregatedCashFlow(BaseModel):
+    period: str
+    start_date: date
+    end_date: date
+    total_revenues: float
+    total_expenses: float
+    net_cash_flow: float
+
+class ProjectionResponse(BaseModel):
+    daily: List[CashFlowEntry]
+    weekly: List[AggregatedCashFlow]
+    monthly: List[AggregatedCashFlow]
+    quarterly: List[AggregatedCashFlow]
+    annual: List[AggregatedCashFlow]
+
+@app.post("/projection/", response_model=ProjectionResponse, summary="Generate Enhanced Cash Flow Projection")
+def generate_projection(data: ProjectionRequest):
+    """
+    Generates a detailed cash flow projection over a specified planning horizon,
+    including daily details and aggregated summaries.
+    """
+    # Validate planning horizon
+    if data.start_date > data.end_date:
+        raise HTTPException(status_code=400, detail="start_date cannot be after end_date.")
+
+    # Calculate total days
+    total_days = (data.end_date - data.start_date).days + 1
+
+    # Initialize cash flow lists
+    revenues_daily = [0.0 for _ in range(total_days)]
+    expenses_daily = [0.0 for _ in range(total_days)]
+
+    # Helper function to map date to index
+    def date_to_index(d: date) -> int:
+        return (d - data.start_date).days
+
+    # Process all transactions
+    for transaction in data.revenues + data.expenses:
+        multiplier = 1 if transaction in data.revenues else -1
+        try:
+            apply_transaction(
+                transaction,
+                revenues_daily if multiplier == 1 else expenses_daily,
+                data.start_date,
+                data.end_date,
+                multiplier,
+                date_to_index
+            )
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=str(ve))
+
+    # Prepare daily cash flow entries
+    daily_entries = [
+        CashFlowEntry(
+            date=data.start_date + timedelta(days=i),
+            total_revenues=round(revenues_daily[i], 2),
+            total_expenses=round(abs(expenses_daily[i]), 2),  # Expenses are stored as negative
+            net_cash_flow=round(revenues_daily[i] + expenses_daily[i], 2)
+        )
+        for i in range(total_days)
+    ]
+
+    # Aggregate summaries
+    weekly_summary = aggregate_cash_flow(daily_entries, "weekly")
+    monthly_summary = aggregate_cash_flow(daily_entries, "monthly")
+    quarterly_summary = aggregate_cash_flow(daily_entries, "quarterly")
+    annual_summary = aggregate_cash_flow(daily_entries, "annual")
+
+    return ProjectionResponse(
+        daily=daily_entries,
+        weekly=weekly_summary,
+        monthly=monthly_summary,
+        quarterly=quarterly_summary,
+        annual=annual_summary
+    )
+
+def apply_transaction(transaction: Transaction, cash_flow: List[float], horizon_start: date, horizon_end: date, multiplier: int, date_to_index):
+    """
+    Applies a single transaction to the cash flow list.
+    """
+    # Determine transaction effective start and end dates
+    effective_start = max(transaction.start_date, horizon_start)
+    effective_end = min(transaction.end_date or horizon_end, horizon_end)
+
+    if effective_start > effective_end:
+        # Transaction does not affect the planning horizon
+        return
+
+    if transaction.type == TransactionType.one_time:
+        idx = date_to_index(effective_start)
+        if 0 <= idx < len(cash_flow):
+            cash_flow[idx] += transaction.amount * multiplier
+
+    elif transaction.type == TransactionType.repeating:
+        current_date = effective_start
+        while current_date <= effective_end:
+            idx = date_to_index(current_date)
+            if 0 <= idx < len(cash_flow):
+                cash_flow[idx] += transaction.amount * multiplier
+            current_date = get_next_date(current_date, transaction.frequency)
+    else:
+        raise ValueError(f"Unsupported transaction type: {transaction.type}")
+
+def get_next_date(current_date: date, frequency: Frequency) -> date:
+    """
+    Calculates the next date for a repeating transaction based on its frequency.
+    """
+    if frequency == Frequency.daily:
+        return current_date + timedelta(days=1)
+    elif frequency == Frequency.weekly:
+        return current_date + timedelta(weeks=1)
+    elif frequency == Frequency.monthly:
+        return current_date + relativedelta(months=1)
+    elif frequency == Frequency.quarterly:
+        return current_date + relativedelta(months=3)
+    elif frequency == Frequency.annual:
+        return current_date + relativedelta(years=1)
+    else:
+        raise ValueError(f"Unsupported frequency: {frequency}")
+
+def aggregate_cash_flow(daily_entries: List[CashFlowEntry], period: str) -> List[AggregatedCashFlow]:
+    """
+    Aggregates daily cash flow entries into the specified period.
+    
+    Args:
+        daily_entries (List[CashFlowEntry]): List of daily cash flow entries.
+        period (str): The period to aggregate by ("weekly", "monthly", "quarterly", "annual").
+    
+    Returns:
+        List[AggregatedCashFlow]: Aggregated cash flow data.
+    """
+    if period not in {"weekly", "monthly", "quarterly", "annual"}:
+        raise ValueError(f"Unsupported aggregation period: {period}")
+
+    aggregated = []
+    temp_revenue = 0.0
+    temp_expense = 0.0
+    temp_net = 0.0
+    period_start = None
+    period_end = None
+
+    for entry in daily_entries:
+        if period_start is None:
+            period_start = entry.date
+
+        # Determine if the current entry belongs to a new period
+        if not is_same_period(entry.date, period, period_start):
+            # Append the aggregated data for the previous period
+            aggregated.append(
+                AggregatedCashFlow(
+                    period=period.capitalize(),
+                    start_date=period_start,
+                    end_date=period_end,
+                    total_revenues=round(temp_revenue, 2),
+                    total_expenses=round(temp_expense, 2),
+                    net_cash_flow=round(temp_net, 2)
+                )
+            )
+            # Reset temporary counters
+            temp_revenue = 0.0
+            temp_expense = 0.0
+            temp_net = 0.0
+            # Start a new period
+            period_start = entry.date
+
+        # Accumulate the values
+        temp_revenue += entry.total_revenues
+        temp_expense += entry.total_expenses
+        temp_net += entry.net_cash_flow
+        period_end = entry.date
+
+    # Append the last period
+    if period_start is not None:
+        aggregated.append(
+            AggregatedCashFlow(
+                period=period.capitalize(),
+                start_date=period_start,
+                end_date=period_end,
+                total_revenues=round(temp_revenue, 2),
+                total_expenses=round(temp_expense, 2),
+                net_cash_flow=round(temp_net, 2)
+            )
+        )
+
+    return aggregated
+
+def is_same_period(current_date: date, period: str, period_start: date) -> bool:
+    """
+    Checks if the current_date is within the same aggregation period as period_start.
+    
+    Args:
+        current_date (date): The current date to check.
+        period (str): The aggregation period ("weekly", "monthly", "quarterly", "annual").
+        period_start (date): The start date of the current aggregation period.
+    
+    Returns:
+        bool: True if current_date is within the same period as period_start, False otherwise.
+    """
+    if period == "weekly":
+        # Assuming weeks start on the period_start's weekday
+        week_start = period_start
+        week_end = week_start + timedelta(days=6)
+        return week_start <= current_date <= week_end
+    elif period == "monthly":
+        return current_date.month == period_start.month and current_date.year == period_start.year
+    elif period == "quarterly":
+        start_quarter = (period_start.month - 1) // 3 + 1
+        current_quarter = (current_date.month - 1) // 3 + 1
+        return current_quarter == start_quarter and current_date.year == period_start.year
+    elif period == "annual":
+        return current_date.year == period_start.year
+    return False
