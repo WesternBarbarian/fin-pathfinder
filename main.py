@@ -1,6 +1,14 @@
 from typing import List
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
+from datetime import date, timedelta
+from models.cash_flow import (
+    ProjectionRequest,
+    ProjectionResponse,
+    CashFlowEntry,
+    Transaction
+)
+from utils.cash_flow import apply_transaction, aggregate_cash_flow
 from starlette.exceptions import ExceptionMiddleware
 from fastapi.responses import JSONResponse
 from utils.exceptions import (
@@ -56,6 +64,53 @@ app.add_middleware(
 @limiter.limit(BURST_LIMIT)
 async def root(request: Request):
     return {"message": "Financial Planning Simulator API is running"}
+
+@app.post("/projection/", response_model=ProjectionResponse)
+@limiter.limit(RATE_LIMIT)
+@limiter.limit(BURST_LIMIT)
+async def generate_projection(request: Request, data: ProjectionRequest):
+    """Generate cash flow projection over specified planning horizon"""
+    if data.start_date > data.end_date:
+        raise HTTPException(status_code=400, detail="start_date cannot be after end_date.")
+
+    total_days = (data.end_date - data.start_date).days + 1
+    revenues_daily = [0.0 for _ in range(total_days)]
+    expenses_daily = [0.0 for _ in range(total_days)]
+
+    def date_to_index(d: date) -> int:
+        return (d - data.start_date).days
+
+    for transaction in data.revenues + data.expenses:
+        multiplier = 1 if transaction in data.revenues else -1
+        try:
+            apply_transaction(
+                transaction,
+                revenues_daily if multiplier == 1 else expenses_daily,
+                data.start_date,
+                data.end_date,
+                multiplier,
+                date_to_index
+            )
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=str(ve))
+
+    daily_entries = [
+        CashFlowEntry(
+            date=data.start_date + timedelta(days=i),
+            total_revenues=round(revenues_daily[i], 2),
+            total_expenses=round(abs(expenses_daily[i]), 2),
+            net_cash_flow=round(revenues_daily[i] + expenses_daily[i], 2)
+        )
+        for i in range(total_days)
+    ]
+
+    return ProjectionResponse(
+        daily=daily_entries,
+        weekly=aggregate_cash_flow(daily_entries, "weekly"),
+        monthly=aggregate_cash_flow(daily_entries, "monthly"),
+        quarterly=aggregate_cash_flow(daily_entries, "quarterly"),
+        annual=aggregate_cash_flow(daily_entries, "annual")
+    )
 
 @app.exception_handler(FinancialPlannerException)
 async def financial_planner_exception_handler(
