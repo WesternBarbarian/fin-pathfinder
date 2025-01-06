@@ -14,7 +14,8 @@ from fastapi.responses import JSONResponse
 from utils.exceptions import (
     ErrorResponse,
     FinancialPlannerException,
-    ValidationError
+    ValidationError,
+    SimulationError
 ) 
 from utils.validation import validate_asset_allocation
 from slowapi import Limiter

@@ -29,4 +29,13 @@ class ValidationError(FinancialPlannerException):
             details=details
         )
 
+class SimulationError(FinancialPlannerException):
+    def __init__(self, message: str, details: Optional[Dict] = None):
+        super().__init__(
+            status_code=500,
+            message=message,
+            error_code="SIMULATION_ERROR",
+            details=details
+        )
+
 
