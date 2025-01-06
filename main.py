@@ -65,7 +65,7 @@ app.add_middleware(
 async def root(request: Request):
     return {"message": "Financial Planning Simulator API is running"}
 
-@app.post("/projection/", response_model=ProjectionResponse)
+@app.post("/forecast-cash-flow/", response_model=ProjectionResponse)
 @limiter.limit(RATE_LIMIT)
 @limiter.limit(BURST_LIMIT)
 async def generate_projection(request: Request, data: ProjectionRequest):
