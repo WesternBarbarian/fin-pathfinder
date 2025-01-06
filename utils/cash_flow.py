@@ -76,7 +76,8 @@ def aggregate_cash_flow(daily_entries: List[CashFlowEntry], period: str) -> List
                     end_date=period_end,
                     total_revenues=round(temp_revenue, 2),
                     total_expenses=round(temp_expense, 2),
-                    net_cash_flow=round(temp_net, 2)
+                    net_cash_flow=round(temp_net, 2),
+                    cash_balance=round(daily_entries[daily_entries.index(entry) - 1].cash_balance, 2)
                 )
             )
             temp_revenue = 0.0
@@ -97,7 +98,8 @@ def aggregate_cash_flow(daily_entries: List[CashFlowEntry], period: str) -> List
                 end_date=period_end,
                 total_revenues=round(temp_revenue, 2),
                 total_expenses=round(temp_expense, 2),
-                net_cash_flow=round(temp_net, 2)
+                net_cash_flow=round(temp_net, 2),
+                cash_balance=round(daily_entries[-1].cash_balance, 2)
             )
         )
 
