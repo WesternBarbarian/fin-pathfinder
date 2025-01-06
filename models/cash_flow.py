@@ -16,12 +16,12 @@ class Frequency(str, Enum):
     annual = "annual"
 
 class Transaction(BaseModel):
-    name: str = Field(..., example="Subscription Fee")
-    amount: float = Field(..., example=1000.0, gt=0)
+    name: str = Field(..., example="Salary Payment")
+    amount: float = Field(..., example=5000.0, gt=0)
     type: TransactionType = Field(..., example="repeating")
     frequency: Optional[Frequency] = Field(None, example="monthly")
-    start_date: date = Field(..., example="2025-01-01")
-    end_date: Optional[date] = Field(None, example="2025-12-31")
+    start_date: date = Field(..., example="2024-01-01")
+    end_date: Optional[date] = Field(None, example="2024-12-31")
 
     @validator("frequency", always=True)
     def validate_frequency(cls, v, values):
