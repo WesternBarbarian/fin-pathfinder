@@ -19,10 +19,10 @@ class UserData(BaseModel):
     num_simulations: int = DEFAULT_VALUES["num_simulations"]
     expense_growth_rate: float = DEFAULT_VALUES["expense_growth_rate"]
     income_growth_rate: float = DEFAULT_VALUES["income_growth_rate"]
-    asset_allocation: Dict[str, float] = {}
-    mean_returns: Optional[List[float]] = None
-    volatility: Optional[List[float]] = None  # Add this field
-    correlation_matrix: Optional[List[List[float]]] = None  # Add this field
+    asset_allocation: Dict[str, float] = {asset: 1/len(ASSET_CLASSES) for asset in ASSET_CLASSES}  # Equal weight by default
+    mean_returns: Optional[List[float]] = [DEFAULT_MEAN_RETURNS[asset] for asset in ASSET_CLASSES]
+    volatility: Optional[List[float]] = [DEFAULT_VOLATILITY[asset] for asset in ASSET_CLASSES]
+    correlation_matrix: Optional[List[List[float]]] = DEFAULT_CORRELATION.tolist()
     use_expense_interpolation: bool = False
     use_income_interpolation: bool = False
 
