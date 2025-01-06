@@ -24,8 +24,8 @@ class Transaction(BaseModel):
     end_date: Optional[date] = Field(None, example="2024-12-31")
 
     @field_validator("frequency")
-    def validate_frequency(cls, v, values):
-        if values.get("type") == TransactionType.repeating:
+    def validate_frequency(cls, v, info):
+        if info.data.get("type") == TransactionType.repeating:
             if not v:
                 raise ValueError("Frequency is required for repeating transactions.")
         else:
@@ -34,8 +34,8 @@ class Transaction(BaseModel):
         return v
 
     @field_validator("end_date")
-    def validate_dates(cls, v, values):
-        start = values.get("start_date")
+    def validate_dates(cls, v, info):
+        start = info.data.get("start_date")
         if v and v < start:
             raise ValueError("end_date cannot be before start_date.")
         return v
