@@ -1,0 +1,109 @@
+______________________ test_forecast_cash_flow_basic _______________________
+
+    def test_forecast_cash_flow_basic():
+        """Test basic cash flow forecast"""
+        request_data = {
+            "expenses": [{
+                "name": "Rent",
+                "amount": 2000.0,
+                "type": "repeating",
+                "frequency": "monthly",
+                "start_date": "2024-01-01",
+                "end_date": "2024-12-31"
+            }],
+            "revenues": [{
+                "name": "Salary",
+                "amount": 5000.0,
+                "type": "repeating",
+                "frequency": "monthly",
+                "start_date": "2024-01-01",
+                "end_date": "2024-12-31"
+            }],
+            "start_date": "2024-01-01",
+            "end_date": "2024-12-31"
+        }
+    
+>       response = client.post("/forecast-cash-flow/", json=request_data)
+
+tests/test_endpoints.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.pythonlibs/lib/python3.11/site-packages/starlette/testclient.py:636: in post
+    return super().post(
+.pythonlibs/lib/python3.11/site-packages/httpx/_client.py:1157: in post
+    return self.request(
+.pythonlibs/lib/python3.11/site-packages/starlette/testclient.py:519: in request
+    return super().request(
+.pythonlibs/lib/python3.11/site-packages/httpx/_client.py:837: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.pythonlibs/lib/python3.11/site-packages/httpx/_client.py:926: in send
+    response = self._send_handling_auth(
+.pythonlibs/lib/python3.11/site-packages/httpx/_client.py:954: in _send_handling_auth
+    response = self._send_handling_redirects(
+.pythonlibs/lib/python3.11/site-packages/httpx/_client.py:991: in _send_handling_redirects
+    response = self._send_single_request(request)
+.pythonlibs/lib/python3.11/site-packages/httpx/_client.py:1027: in _send_single_request
+    response = transport.handle_request(request)
+.pythonlibs/lib/python3.11/site-packages/starlette/testclient.py:401: in handle_request
+    raise exc
+.pythonlibs/lib/python3.11/site-packages/starlette/testclient.py:398: in handle_request
+    portal.call(self.app, scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/anyio/from_thread.py:277: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+.pythonlibs/lib/python3.11/site-packages/anyio/from_thread.py:217: in _call_func
+    retval = await retval
+.pythonlibs/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+.pythonlibs/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+.pythonlibs/lib/python3.11/site-packages/starlette/middleware/cors.py:85: in __call__
+    await self.app(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/middleware/exceptions.py:65: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+.pythonlibs/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+.pythonlibs/lib/python3.11/site-packages/starlette/routing.py:754: in __call__
+    await self.middleware_stack(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/routing.py:774: in app
+    await route.handle(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/routing.py:295: in handle
+    await self.app(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/routing.py:77: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.pythonlibs/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+.pythonlibs/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+.pythonlibs/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await f(request)
+.pythonlibs/lib/python3.11/site-packages/fastapi/routing.py:269: in app
+    solved_result = await solve_dependencies(
+.pythonlibs/lib/python3.11/site-packages/fastapi/dependencies/utils.py:628: in solve_dependencies
+    ) = await request_body_to_args(  # body_params checked above
+.pythonlibs/lib/python3.11/site-packages/fastapi/dependencies/utils.py:758: in request_body_to_args
+    v_, errors_ = field.validate(value, values, loc=loc)
+.pythonlibs/lib/python3.11/site-packages/fastapi/_compat.py:127: in validate
+    self._type_adapter.validate_python(value, from_attributes=True),
+.pythonlibs/lib/python3.11/site-packages/pydantic/type_adapter.py:135: in wrapped
+    return func(self, *args, **kwargs)
+.pythonlibs/lib/python3.11/site-packages/pydantic/type_adapter.py:366: in validate_python
+    return self.validator.validate_python(object, strict=strict, from_attributes=from_attributes, context=context)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <class 'models.cash_flow.Transaction'>
+v = <Frequency.monthly: 'monthly'>
+values = ValidationInfo(config={'title': 'Transaction'}, context=None, data={'name': 'Rent', 'amount': 2000.0, 'type': <TransactionType.repeating: 'repeating'>}, field_name='frequency')
+
+    @field_validator("frequency")
+    def validate_frequency(cls, v, values):
+>       if values.get("type") == TransactionType.repeating:
+E       AttributeError: 'pydantic_core._pydantic_core.ValidationInfo' object has no attribute 'get'
