@@ -1,7 +1,7 @@
 from pydantic import BaseModel, field_validator
 from typing import Dict, List, Optional
 from utils.validation import validate_asset_allocation, validate_numeric_input
-from utils.constraints import DEFAULT_VALUES, ASSET_CLASSES
+from utils.constraints import DEFAULT_VALUES, ASSET_CLASSES, DEFAULT_MEAN_RETURNS, DEFAULT_VOLATILITY, DEFAULT_CORRELATION
 from utils.exceptions import ValidationError
 
 
