@@ -49,6 +49,7 @@ class ProjectionRequest(BaseModel):
     revenues: List[Transaction] = Field(default_factory=list)
     start_date: date = Field(..., example="2025-01-01")
     end_date: date = Field(..., example="2025-12-31")
+    starting_cash_balance: float = Field(default=0.0, example=10000.0, ge=0)
 
     @field_validator("end_date")
     def validate_horizon(cls, v, info):
@@ -63,6 +64,7 @@ class CashFlowEntry(BaseModel):
     total_revenues: float
     total_expenses: float
     net_cash_flow: float
+    cash_balance: float
 
 
 class AggregatedCashFlow(BaseModel):
@@ -72,6 +74,7 @@ class AggregatedCashFlow(BaseModel):
     total_revenues: float
     total_expenses: float
     net_cash_flow: float
+    cash_balance: float
 
 
 class ProjectionResponse(BaseModel):

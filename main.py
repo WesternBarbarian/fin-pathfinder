@@ -95,15 +95,24 @@ async def generate_projection(request: Request, data: ProjectionRequest):
         except ValueError as ve:
             raise HTTPException(status_code=400, detail=str(ve))
 
-    daily_entries = [
-        CashFlowEntry(
-            date=data.start_date + timedelta(days=i),
-            total_revenues=round(revenues_daily[i], 2),
-            total_expenses=round(abs(expenses_daily[i]), 2),
-            net_cash_flow=round(revenues_daily[i] + expenses_daily[i], 2)
+    running_balance = data.starting_cash_balance
+    daily_entries = []
+    
+    for i in range(total_days):
+        current_revenues = round(revenues_daily[i], 2)
+        current_expenses = round(abs(expenses_daily[i]), 2)
+        net_flow = round(revenues_daily[i] + expenses_daily[i], 2)
+        running_balance += net_flow
+        
+        daily_entries.append(
+            CashFlowEntry(
+                date=data.start_date + timedelta(days=i),
+                total_revenues=current_revenues,
+                total_expenses=current_expenses,
+                net_cash_flow=net_flow,
+                cash_balance=round(running_balance, 2)
+            )
         )
-        for i in range(total_days)
-    ]
 
     return ProjectionResponse(
         daily=daily_entries,
