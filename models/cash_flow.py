@@ -20,8 +20,8 @@ class Transaction(BaseModel):
     amount: float = Field(..., example=5000.0, gt=0)
     type: TransactionType = Field(..., example="repeating")
     frequency: Optional[Frequency] = Field(None, example="monthly")
-    start_date: date = Field(..., example="2024-01-01")
-    end_date: Optional[date] = Field(None, example="2024-12-31")
+    start_date: date = Field(..., example="2025-01-01")
+    end_date: Optional[date] = Field(None, example="2025-12-31")
 
     @field_validator("frequency")
     def validate_frequency(cls, v, info):
