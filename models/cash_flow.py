@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from datetime import date
 from typing import List, Optional
 from enum import Enum
@@ -23,7 +23,7 @@ class Transaction(BaseModel):
     start_date: date = Field(..., example="2024-01-01")
     end_date: Optional[date] = Field(None, example="2024-12-31")
 
-    @validator("frequency", always=True)
+    @field_validator("frequency")
     def validate_frequency(cls, v, values):
         if values.get("type") == TransactionType.repeating:
             if not v:
@@ -33,7 +33,7 @@ class Transaction(BaseModel):
                 raise ValueError("Frequency should not be set for one-time transactions.")
         return v
 
-    @validator("end_date")
+    @field_validator("end_date")
     def validate_dates(cls, v, values):
         start = values.get("start_date")
         if v and v < start:
@@ -46,7 +46,7 @@ class ProjectionRequest(BaseModel):
     start_date: date = Field(..., example="2025-01-01")
     end_date: date = Field(..., example="2025-12-31")
 
-    @validator("end_date")
+    @field_validator("end_date")
     def validate_horizon(cls, v, values):
         start = values.get("start_date")
         if start and v < start:
