@@ -100,4 +100,14 @@ This tool is for testing and educational purposes only. The results should not b
 - Poetry
 
 ## License
-This project is licensed under the MIT License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+This means you can:
+- Use this code commercially
+- Modify the code
+- Distribute the code
+- Use it privately
+- Sublicense the code
+
+The only requirement is including the original license and copyright notice in any copy of the software/source.
