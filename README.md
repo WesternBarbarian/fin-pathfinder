@@ -5,6 +5,18 @@ A FastAPI-based financial planning calculator API for testing and educational pu
 
 Front-end: https://lifebeyondthe9to5.com
 
+## LEGAL DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED FOR EDUCATIONAL AND TESTING PURPOSES ONLY. 
+
+- This is NOT financial advice
+- I am NOT a financial planner, advisor, or registered investment professional
+- The calculations and projections provided are purely for educational purposes
+- Any results or projections should not be considered as financial or investment advice
+- You should consult with qualified financial professionals for actual financial planning and investment decisions
+- This software is provided "AS IS" without any warranties or guarantees
+- The creator(s) assume no responsibility for any financial decisions made based on this tool
+
 ## Features
 
 - Cash flow projection and analysis
