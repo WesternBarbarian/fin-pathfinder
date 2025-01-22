@@ -3,13 +3,14 @@
 
 A FastAPI-based financial planning calculator API for testing and educational purposes. This API provides endpoints for cash flow projections and portfolio simulations.
 
+Front-end: https://lifebeyondthe9to5.com
+
 ## Features
 
 - Cash flow projection and analysis
-- Portfolio growth simulation
-- Scenario management
+- Portfolio simulation
 - Rate limiting for API protection
-- Comprehensive input validation
+- Input validation
 - CORS protection with configurable origins
 
 ## Getting Started
