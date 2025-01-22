@@ -29,13 +29,13 @@ POST /forecast-cash-flow/
 ```
 Generate detailed cash flow projections with daily, weekly, monthly, quarterly, and annual aggregations.
 
-### 2. Portfolio Simulation
+### 2. Portfolio Simulation For Early Retirees and Freelancers
 ```http
 POST /simulate
 ```
 Simulate portfolio growth and calculate retirement metrics based on user inputs.
 
-### 3. Scenario Management
+### 3. TODO - Scenario Management
 - Save and retrieve simulation scenarios
 - Compare different financial planning approaches
 
