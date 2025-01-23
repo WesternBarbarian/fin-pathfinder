@@ -1,4 +1,3 @@
-
 # Financial Planning Simulator API
 
 A FastAPI-based financial planning calculator API for testing and educational purposes. This API provides endpoints for cash flow projections and portfolio simulations.
@@ -27,12 +26,23 @@ THIS SOFTWARE IS PROVIDED FOR EDUCATIONAL AND TESTING PURPOSES ONLY.
 
 ## Getting Started
 
-1. Clone this project on Replit
-2. The project will automatically install dependencies using Poetry
+1. Clone this repository and navigate to the project directory:
+   ```bash
+   git clone https://github.com/username/project-name
+   cd project-name
+   ```
+
+2. Install required dependencies from pyproject.toml:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 3. Run the development server:
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
    ```
-   uvicorn main:app --host 0.0.0.0 --reload
-   ```
+
+The API will be available at `http://0.0.0.0:8000`. You can access the interactive API documentation at `http://0.0.0.0:8000/docs`.
 
 ## API Endpoints
 
