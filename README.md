@@ -44,6 +44,14 @@ THIS SOFTWARE IS PROVIDED FOR EDUCATIONAL AND TESTING PURPOSES ONLY.
 
 The API will be available at `http://0.0.0.0:8000`. You can access the interactive API documentation at `http://0.0.0.0:8000/docs`.
 
+### CORS Configuration
+By default, the API allows requests from:
+- https://lifebeyondthe9to5.com
+- http://localhost:3000
+- Replit domains (*.replit.dev|app|co)
+
+If you need to allow different origins, modify the ALLOWED_ORIGINS and ALLOWED_REGEX constants in main.py.
+
 ## API Endpoints
 
 ### 1. Cash Flow Projection
